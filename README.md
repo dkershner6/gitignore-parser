@@ -2,6 +2,8 @@
 
 GitHub Action to parse a .gitignore file for information. Generally, this is most useful when you are committing in your workflow, to ensure certain secret-containing files are not being committed.
 
+This action uses the same .gitignore parser as eslint, prettier, and many others, and can be trusted for accuracy.
+
 ## Usage
 
 ### Inputs

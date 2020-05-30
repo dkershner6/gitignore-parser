@@ -1,4 +1,4 @@
-import { IGitIgnore } from './parseGitIgnore';
+import { Ignore } from 'ignore';
 
 export interface IDeniedAndAccepted {
     notDenied: string[];
@@ -8,14 +8,14 @@ export interface IDeniedAndAccepted {
 const filterDeniedAndAccepted = (
     mustDeny: string[],
     mustAccept: string[],
-    gitIgnore: IGitIgnore
+    gitIgnore: Ignore
 ): IDeniedAndAccepted => {
     const notDenied = mustDeny.filter(
-        (fileName) => fileName !== '' && gitIgnore.accepts(fileName)
+        (fileName) => fileName !== '' && !gitIgnore.ignores(fileName)
     );
 
     const notAccepted = mustAccept.filter(
-        (fileName) => fileName !== '' && gitIgnore.denies(fileName)
+        (fileName) => fileName !== '' && gitIgnore.ignores(fileName)
     );
 
     return { notDenied, notAccepted };
