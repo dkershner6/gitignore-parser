@@ -1,27 +1,27 @@
-import {wait} from '../src/wait'
-import * as process from 'process'
-import * as cp from 'child_process'
-import * as path from 'path'
+import * as core from '@actions/core';
+import run from '../src/main';
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10)
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number')
-})
+describe('Main', () => {
+    const setOutputSpy = jest.spyOn(core, 'setOutput');
+    const setFailedSpy = jest.spyOn(core, 'setFailed');
 
-test('wait 500 ms', async () => {
-  const start = new Date()
-  await wait(500)
-  const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
-  expect(delta).toBeGreaterThan(450)
-})
+    afterEach(() => {
+        jest.resetAllMocks();
+    });
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500'
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
-  const options: cp.ExecSyncOptions = {
-    env: process.env
-  }
-  console.log(cp.execSync(`node ${ip}`, options).toString())
-})
+    it('Should return gitignored with two items, no lines_not_included, and all_lines_included true', () => {
+        const inputs = {
+            path: './__tests__/__mocks__/normal',
+            includes_lines: 'test,test1234'
+        };
+
+        run(inputs);
+
+        const outputCalls = setOutputSpy.mock.calls;
+
+        expect(outputCalls[0]).toEqual(['gitignored', 'test,test1234']);
+        expect(outputCalls[1]).toEqual(['lines_not_included', '']);
+        expect(outputCalls[2]).toEqual(['all_lines_included', 'true']);
+        expect(setFailedSpy).not.toHaveBeenCalled();
+    });
+});
