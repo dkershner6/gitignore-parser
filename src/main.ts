@@ -1,4 +1,4 @@
-import { setFailed, error as errorLog } from '@actions/core';
+import { setFailed } from '@actions/core';
 import gatherAllInputs from './tasks/gatherAllInputs';
 import parseGitIgnore from './tasks/parseGitIgnore';
 import filterDeniedAndAccepted from './tasks/filterDeniedAndAccepted';
