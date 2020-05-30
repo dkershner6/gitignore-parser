@@ -6,21 +6,25 @@ inputs:
     description: "The location of the .gitignore file from the repo root, with no filename."
     default: "./"
     required: false
-  ignored_includes:
-    description: "Comma-delimited string of what the gitignore must include"
+  must_deny:
+    description: "Comma-delimited string of files and paths the gitignore must deny being committed"
     default: ""
     required: false
-  fail_if_not_found:
-    description: "true/false to indicate whether the workflow should fail if a string in ignored_includes is not found"
+  must_accept:
+    description: "Comma-delimited string of files and paths the gitignore must accept being committed"
+    default: ""
+    required: false
+  fail_on_error:
+    description: "true/false to indicate whether the workflow should fail if a string in must_deny is not found"
     default: "true"
     required: false
 outputs:
-  gitignored:
-    description: "A Comma-delimited string containing all lines in gitignore"
-  all_included:
-    description: "Returns a boolean string ('true'/'false') representing whether all of the lines in ignored_includes were indeed included"
-  lines_not_included:
-    description: "A Comma-delimited string containing all of the lines from ignored_includes that were not included"
+  requirements_met:
+    description: "Returns a boolean string ('true'/'false') representing whether all of the lines in must_deny were indeed denied, and all must_accept were accepted"
+  not_denied:
+    description: "A Comma-delimited string containing all of the lines from must_deny that were not denied"
+  not_accepted:
+    description: "A Comma-delimited string containing all of the lines from must_accept that were not accepted"
 
 runs:
   using: "node12"

@@ -19,17 +19,17 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: ./
-        id: 'gitignore-parser'
+        id: "gitignore-parser"
         with:
-          ignored_includes: "node_modules,lib/**/*"
+          must_deny: "node_modules,lib/**/*"
       # Will fail if it doesn't contain either, but outputs are also present
-      - name: Print whether .gitignore contains above
-        run: echo ${{ steps.gitignore-parser.outputs.all_included }}
+      - name: Print whether .gitignore denies above
+        run: echo ${{ steps.gitignore-parser.outputs.requirements_met }}
   auto-approve-pr:
     runs-on: ubuntu-latest
     needs: [build, test]
     steps:
-    - uses: hmarr/auto-approve-action@v2.0.0
-      if: github.event == 'pull_request' && github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || github.actor == 'dkershner6'
-      with:
-        github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - uses: hmarr/auto-approve-action@v2.0.0
+        if: github.event == 'pull_request' && github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || github.actor == 'dkershner6'
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
