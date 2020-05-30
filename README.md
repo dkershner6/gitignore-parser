@@ -43,7 +43,7 @@ jobs:
         uses: dkershner6/gitignore-parser@v1
         with:
             must_deny: '.npmrc,.env'
-      # Will fail if it doesn't contain either, but outputs are also present
-      - name: Print whether .gitignore contains .npmrc and .env
+      # Will fail if it doesn't deny either, but outputs are also present
+      - name: Print whether .gitignore denies .npmrc and .env
         run: echo ${{ steps.gitignore-parser.outputs.all_included }}
 ```
