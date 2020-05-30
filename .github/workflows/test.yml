@@ -4,20 +4,24 @@ on: # rebuild any PRs and main branch changes
   push:
     branches:
       - master
-      - 'releases/*'
+      - "releases/*"
 
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - run: |
-        npm install
-        npm run all
+      - uses: actions/checkout@v1
+      - run: |
+          npm install
+          npm run all
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: ./
-      with: 
-        milliseconds: 1000
+      - uses: actions/checkout@v1
+      - uses: ./
+        id: 'gitignore-parser'
+        with:
+          ignored_includes: "node_modules,lib/**/*"
+      # Will fail if it doesn't contain either, but outputs are also present
+      - name: Print whether .gitignore contains above
+        run: echo ${{ steps.gitignore-parser.outputs.all_included }}

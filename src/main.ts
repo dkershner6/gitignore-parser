@@ -1,19 +1,26 @@
-import * as core from '@actions/core'
-import {wait} from './wait'
+import * as core from '@actions/core';
+import gatherAllInputs from './tasks/gatherAllInputs';
+import parseGitIgnore from './tasks/parseGitIgnore';
+import filterToNotIncluded from './tasks/filterToNotIncluded';
+import respond from './tasks/respond';
 
-async function run(): Promise<void> {
-  try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`)
+export default async function run(inputs?: {
+    [key: string]: string;
+}): Promise<void> {
+    try {
+        const { path, includesLines, failIfNotFound } = gatherAllInputs(inputs);
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+        const gitIgnoreLines = parseGitIgnore(path);
 
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    core.setFailed(error.message)
-  }
+        const linesNotIncluded = filterToNotIncluded(
+            includesLines,
+            gitIgnoreLines
+        );
+
+        respond(linesNotIncluded, failIfNotFound);
+    } catch (error) {
+        core.setFailed(error.message);
+    }
 }
 
-run()
+run();
