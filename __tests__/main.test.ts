@@ -160,4 +160,25 @@ describe('Main', () => {
         );
         expect(setFailedSpy).toHaveBeenCalled();
     });
+
+    it('Should return requirements NOT met for the .gitignore of this repo, with invalid must_deny and must_accept, but not fail when fail_on_error set to false', () => {
+        const inputs = {
+            path: './',
+            must_deny: '',
+            must_accept: 'node_modules/a-package-so-great-you-should-commit-it',
+            fail_on_error: 'false',
+        };
+
+        run(inputs);
+
+        const outputCalls = setOutputSpy.mock.calls;
+
+        expect(outputCalls[0]).toEqual(['not_denied', '']);
+        expect(outputCalls[1]).toEqual(['not_accepted', inputs.must_accept]);
+        expect(outputCalls[2]).toEqual(['requirements_met', 'false']);
+        expect(errorSpy).toHaveBeenCalledWith(
+            `${ACCEPT_ERROR_MESSAGE_PREFIX}${inputs.must_accept}`
+        );
+        expect(setFailedSpy).not.toHaveBeenCalled();
+    });
 });
