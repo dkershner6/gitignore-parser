@@ -181,4 +181,21 @@ describe('Main', () => {
         );
         expect(setFailedSpy).not.toHaveBeenCalled();
     });
+
+    it('Should handle strings ending in * correctly (should deny a file without the *)', () => {
+        const inputs = {
+            path: './__mocks__/normal',
+            must_deny: '.env',
+        };
+
+        run(inputs);
+
+        const outputCalls = setOutputSpy.mock.calls;
+
+        expect(outputCalls[0]).toEqual(['not_denied', '']);
+        expect(outputCalls[1]).toEqual(['not_accepted', '']);
+        expect(outputCalls[2]).toEqual(['requirements_met', 'true']);
+        expect(errorSpy).not.toHaveBeenCalled();
+        expect(setFailedSpy).not.toHaveBeenCalled();
+    });
 });

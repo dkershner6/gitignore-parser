@@ -1,6 +1,6 @@
 {
   "name": "@dkershner6/gitignore-parser",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "private": true,
   "description": "GitHub Action to parse a .gitignore file for information",
   "main": "lib/main.js",
@@ -27,7 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.4",
-    "gitignore-parser": "0.0.2"
+    "ignore": "^5.1.8"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
