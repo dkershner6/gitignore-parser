@@ -46,6 +46,6 @@ jobs:
     needs: [build, test, other-checks]
     steps:
       - uses: hmarr/auto-approve-action@v2.0.0
-        if: github.event == 'pull_request' && github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || github.actor == 'dkershner6'
+        if: github.event == 'pull_request' && (github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || github.actor == 'dkershner6')
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
