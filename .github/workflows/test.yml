@@ -19,5 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: ./
+        id: 'gitignore-parser'
         with:
           ignored_includes: "node_modules,lib/**/*"
+      # Will fail if it doesn't contain either, but outputs are also present
+      - name: Print whether .gitignore contains above
+        run: echo ${{ steps.gitignore-parser.outputs.all_included }}
