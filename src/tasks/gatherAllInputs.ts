@@ -18,10 +18,12 @@ const gatherAllInputs = (inputs?: { [key: string]: string }): IInputs => {
         inputs?.fail_if_not_found ?? core.getInput('fail_if_not_found');
     core.debug(`Input - fail_if_not_found: ${failIfNotFoundInput}`);
 
+    const failIfNotFound = failIfNotFoundInput === 'false' ? false : true;
+
     return {
         path: pathInput ?? '/',
         includesLines: includesLinesInput?.split(',') ?? [],
-        failIfNotFound: Boolean(failIfNotFoundInput) ?? true
+        failIfNotFound
     };
 };
 
