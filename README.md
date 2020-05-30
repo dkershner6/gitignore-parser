@@ -19,7 +19,6 @@ Will exist on `${{ steps.[id].outputs.[key] }}`
 
 | key | description |
 |-----|-------------|
-| gitignored | A Comma-delimited string containing all lines in gitignore |
 | requirements_met | Returns a boolean string ('true'/'false') representing whether all of the lines in must_deny were indeed denied, and all must_accept were accepted |
 | not_denied | A Comma-delimited string containing all of the lines from must_deny that were not denied |
 | not_accepted | A Comma-delimited string containing all of the lines from must_accept that were not accepted |
