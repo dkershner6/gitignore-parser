@@ -1,10 +1,8 @@
-name: "build-test"
+name: "Check on PRs"
 on: # rebuild any PRs and main branch changes
   pull_request:
-  push:
     branches:
       - master
-      - "releases/*"
 
 jobs:
   build: # make sure build/ci work properly
@@ -46,6 +44,6 @@ jobs:
     needs: [build, test, other-checks]
     steps:
       - uses: hmarr/auto-approve-action@v2.0.0
-        if: github.event == 'pull_request' && (github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || github.actor == 'dkershner6')
+        if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || github.actor == 'dkershner6'
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
