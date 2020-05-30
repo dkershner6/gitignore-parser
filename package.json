@@ -1,6 +1,6 @@
 {
   "name": "@dkershner6/gitignore-parser",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "private": true,
   "description": "GitHub Action to parse a .gitignore file for information",
   "main": "lib/main.js",

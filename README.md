@@ -19,7 +19,6 @@ Will exist on `${{ steps.[id].outputs.[key] }}`
 
 | key | description |
 |-----|-------------|
-| gitignored | A Comma-delimited string containing all lines in gitignore |
 | requirements_met | Returns a boolean string ('true'/'false') representing whether all of the lines in must_deny were indeed denied, and all must_accept were accepted |
 | not_denied | A Comma-delimited string containing all of the lines from must_deny that were not denied |
 | not_accepted | A Comma-delimited string containing all of the lines from must_accept that were not accepted |
@@ -44,7 +43,7 @@ jobs:
         uses: dkershner6/gitignore-parser@v1
         with:
             must_deny: '.npmrc,.env'
-      # Will fail if it doesn't contain either, but outputs are also present
-      - name: Print whether .gitignore contains .npmrc and .env
+      # Will fail if it doesn't deny either, but outputs are also present
+      - name: Print whether .gitignore denies .npmrc and .env
         run: echo ${{ steps.gitignore-parser.outputs.all_included }}
 ```
