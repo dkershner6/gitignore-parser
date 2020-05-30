@@ -55,20 +55,35 @@ module.exports =
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ACCEPT_ERROR_MESSAGE_PREFIX = exports.DENY_ERROR_MESSAGE_PREFIX = void 0;
 const core_1 = __webpack_require__(470);
-const respond = (linesNotIncluded, failIfNotFound) => {
-    const linesNotIncludedString = linesNotIncluded.join(',');
-    const errorMessage = `Lines that were not included: ${linesNotIncludedString}`;
-    core_1.setOutput('lines_not_included', linesNotIncludedString);
-    if (linesNotIncluded.length === 0) {
-        core_1.setOutput('all_included', 'true');
+exports.DENY_ERROR_MESSAGE_PREFIX = 'Please add the following to your .gitignore file (replace commas with new lines): ';
+exports.ACCEPT_ERROR_MESSAGE_PREFIX = 'Please remove the following from your .gitignore file (might be a pattern, or add to .gitignore with a ! in front): ';
+const respond = (notDenied, notAccepted, failOnError) => {
+    const notDeniedString = notDenied.join(',');
+    core_1.setOutput('not_denied', notDeniedString);
+    if (notDenied.length > 0) {
+        const denyErrorMessage = `${exports.DENY_ERROR_MESSAGE_PREFIX}${notDeniedString}`;
+        core_1.error(denyErrorMessage);
+    }
+    const notAcceptedString = notAccepted.join(',');
+    core_1.setOutput('not_accepted', notAcceptedString);
+    if (notAccepted.length > 0) {
+        const acceptErrorMessage = `${exports.ACCEPT_ERROR_MESSAGE_PREFIX}${notAcceptedString}`;
+        core_1.error(acceptErrorMessage);
+    }
+    const requirementsAreMet = notDenied.length === 0 && notAccepted.length === 0;
+    finalResponse(requirementsAreMet, failOnError);
+};
+const finalResponse = (requirementsAreMet, failOnError) => {
+    if (requirementsAreMet) {
+        core_1.setOutput('requirements_met', 'true');
     }
     else {
-        core_1.setOutput('all_included', 'false');
-        core_1.error(errorMessage);
-    }
-    if (failIfNotFound && linesNotIncluded.length > 0) {
-        core_1.setFailed(errorMessage);
+        core_1.setOutput('requirements_met', 'false');
+        if (failOnError) {
+            core_1.setFailed('A .gitignore error occurred, see above error logging for details.');
+        }
     }
 };
 exports.default = respond;
@@ -83,44 +98,11 @@ module.exports = require("os");
 
 /***/ }),
 
-/***/ 156:
-/***/ (function(__unusedmodule, exports) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const filterToNotIncluded = (includesLines, gitIgnoreLines) => {
-    return includesLines.filter((line) => !gitIgnoreLines.has(line));
-};
-exports.default = filterToNotIncluded;
-
-
-/***/ }),
-
 /***/ 198:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -134,21 +116,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(__webpack_require__(470));
+const core_1 = __webpack_require__(470);
 const gatherAllInputs_1 = __importDefault(__webpack_require__(267));
 const parseGitIgnore_1 = __importDefault(__webpack_require__(935));
-const filterToNotIncluded_1 = __importDefault(__webpack_require__(156));
+const filterDeniedAndAccepted_1 = __importDefault(__webpack_require__(745));
 const respond_1 = __importDefault(__webpack_require__(24));
 function run(inputs) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { path, includesLines, failIfNotFound } = gatherAllInputs_1.default(inputs);
+            const { path, mustDeny, mustAccept, failOnError } = gatherAllInputs_1.default(inputs);
             const gitIgnoreLines = parseGitIgnore_1.default(path);
-            const linesNotIncluded = filterToNotIncluded_1.default(includesLines, gitIgnoreLines);
-            respond_1.default(linesNotIncluded, failIfNotFound);
+            const { notDenied, notAccepted } = filterDeniedAndAccepted_1.default(mustDeny, mustAccept, gitIgnoreLines);
+            respond_1.default(notDenied, notAccepted, failOnError);
         }
         catch (error) {
-            core.setFailed(error.message);
+            // eslint-disable-next-line no-console
+            console.error(error);
+            core_1.setFailed(error.message);
         }
     });
 }
@@ -166,18 +150,21 @@ run();
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = __webpack_require__(470);
 const gatherAllInputs = (inputs) => {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const pathInput = (_a = inputs === null || inputs === void 0 ? void 0 : inputs.path) !== null && _a !== void 0 ? _a : core_1.getInput('path');
     core_1.debug(`Input - path: ${pathInput}`);
-    const includesLinesInput = (_b = inputs === null || inputs === void 0 ? void 0 : inputs.ignored_includes) !== null && _b !== void 0 ? _b : core_1.getInput('ignored_includes');
-    core_1.debug(`Input - ignored_includes: ${includesLinesInput}`);
-    const failIfNotFoundInput = (_c = inputs === null || inputs === void 0 ? void 0 : inputs.fail_if_not_found) !== null && _c !== void 0 ? _c : core_1.getInput('fail_if_not_found');
-    core_1.debug(`Input - fail_if_not_found: ${failIfNotFoundInput}`);
-    const failIfNotFound = failIfNotFoundInput === 'false' ? false : true;
+    const mustDenyInput = (_c = (_b = inputs === null || inputs === void 0 ? void 0 : inputs.must_deny) !== null && _b !== void 0 ? _b : core_1.getInput('must_deny')) !== null && _c !== void 0 ? _c : '';
+    core_1.debug(`Input - must_deny: ${mustDenyInput}`);
+    const mustAcceptInput = (_e = (_d = inputs === null || inputs === void 0 ? void 0 : inputs.must_accept) !== null && _d !== void 0 ? _d : core_1.getInput('must_accept')) !== null && _e !== void 0 ? _e : '';
+    core_1.debug(`Input - must_accept: ${mustAcceptInput}`);
+    const failOnErrorInput = (_f = inputs === null || inputs === void 0 ? void 0 : inputs.fail_on_error) !== null && _f !== void 0 ? _f : core_1.getInput('fail_on_error');
+    core_1.debug(`Input - fail_on_error: ${failOnErrorInput}`);
+    const failOnError = failOnErrorInput === 'false' ? false : true;
     return {
         path: pathInput !== null && pathInput !== void 0 ? pathInput : '/',
-        includesLines: (_d = includesLinesInput === null || includesLinesInput === void 0 ? void 0 : includesLinesInput.split(',')) !== null && _d !== void 0 ? _d : [],
-        failIfNotFound,
+        mustDeny: (_g = mustDenyInput === null || mustDenyInput === void 0 ? void 0 : mustDenyInput.split(',')) !== null && _g !== void 0 ? _g : [],
+        mustAccept: (_h = mustAcceptInput === null || mustAcceptInput === void 0 ? void 0 : mustAcceptInput.split(',')) !== null && _h !== void 0 ? _h : [],
+        failOnError,
     };
 };
 exports.default = gatherAllInputs;
@@ -281,65 +268,6 @@ function escapeProperty(s) {
         .replace(/,/g, '%2C');
 }
 //# sourceMappingURL=command.js.map
-
-/***/ }),
-
-/***/ 464:
-/***/ (function(module) {
-
-"use strict";
-/*!
- * parse-gitignore <https://github.com/jonschlinkert/parse-gitignore>
- *
- * Copyright (c) 2015-present, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-
-
-const gitignore = input => {
-  return input.toString()
-    .split(/\r?\n/)
-    .filter(l => l.trim() !== '' && l.charAt(0) !== '#');
-};
-
-gitignore.parse = (input, fn = line => line) => {
-  let lines = input.toString().split(/\r?\n/);
-  let state = { patterns: [], sections: [] };
-  let section = { name: 'default', patterns: [] };
-
-  for (let line of lines) {
-    if (line.charAt(0) === '#') {
-      section = { name: line.slice(1).trim(), patterns: []};
-      state.sections.push(section);
-      continue;
-    }
-
-    if (line.trim() !== '') {
-      let pattern = fn(line, section, state);
-      section.patterns.push(pattern);
-      state.patterns.push(pattern);
-    }
-  }
-  return state;
-};
-
-gitignore.format = (section) => {
-  return `# ${section.name}\n${section.patterns.join('\n')}\n\n`;
-};
-
-gitignore.stringify = (sections, fn = gitignore.format) => {
-  let result = '';
-  for (let section of [].concat(sections)) result += fn(section);
-  return result.trim();
-};
-
-/**
- * Expose `gitignore`
- */
-
-module.exports = gitignore;
-
 
 /***/ }),
 
@@ -579,10 +507,142 @@ module.exports = require("path");
 
 /***/ }),
 
+/***/ 745:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const filterDeniedAndAccepted = (mustDeny, mustAccept, gitIgnore) => {
+    const notDenied = mustDeny.filter((fileName) => fileName !== '' && gitIgnore.accepts(fileName));
+    const notAccepted = mustAccept.filter((fileName) => fileName !== '' && gitIgnore.denies(fileName));
+    return { notDenied, notAccepted };
+};
+exports.default = filterDeniedAndAccepted;
+
+
+/***/ }),
+
 /***/ 747:
 /***/ (function(module) {
 
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ 773:
+/***/ (function(__unusedmodule, exports) {
+
+/**
+ * Compile the given `.gitignore` content (not filename!)
+ * and return an object with `accepts`, `denies` and `maybe` methods.
+ * These methods each accepts a single filename and determines whether
+ * they are acceptable or unacceptable according to the `.gitignore` definition.
+ *
+ *
+ * @param  {String} content The `.gitignore` content to compile.
+ * @return {Object}         The helper object with methods that operate on the compiled content.
+ */
+exports.compile = function (content) {
+  var parsed = exports.parse(content),
+      positives = parsed[0],
+      negatives = parsed[1];
+  return {
+    accepts: function (input) {
+      if (input[0] === '/') input = input.slice(1);
+      return negatives[0].test(input) || !positives[0].test(input);
+    },
+    denies: function (input) {
+      if (input[0] === '/') input = input.slice(1);
+      return !(negatives[0].test(input) || !positives[0].test(input));
+    },
+    maybe: function (input) {
+      if (input[0] === '/') input = input.slice(1);
+      return negatives[1].test(input) || !positives[1].test(input);
+    }
+  };
+};
+
+/**
+ * Parse the given `.gitignore` content and return an array
+ * containing two further arrays - positives and negatives.
+ * Each of these two arrays in turn contains two regexps, one
+ * strict and one for 'maybe'.
+ *
+ * @param  {String} content  The content to parse,
+ * @return {Array[]}         The parsed positive and negatives definitions.
+ */
+exports.parse = function (content) {
+  return content.split('\n')
+  .map(function (line) {
+    line = line.trim();
+    return line;
+  })
+  .filter(function (line) {
+    return line && line[0] !== '#';
+  })
+  .reduce(function (lists, line) {
+    var isNegative = line[0] === '!';
+    if (isNegative) {
+      line = line.slice(1);
+    }
+    if (line[0] === '/')
+      line = line.slice(1);
+    if (isNegative) {
+      lists[1].push(line);
+    }
+    else {
+      lists[0].push(line);
+    }
+    return lists;
+  }, [[], []])
+  .map(function (list) {
+    return list
+    .sort()
+    .map(prepareRegexes)
+    .reduce(function (list, prepared) {
+      list[0].push(prepared[0]);
+      list[1].push(prepared[1]);
+      return list;
+    }, [[], [], []]);
+  })
+  .map(function (item) {
+    return [
+      item[0].length > 0 ? new RegExp('^((' + item[0].join(')|(') + '))') : new RegExp('$^'),
+      item[1].length > 0 ? new RegExp('^((' + item[1].join(')|(') + '))') : new RegExp('$^')
+    ]
+  });
+};
+
+function prepareRegexes (pattern) {
+  return [
+    // exact regex
+    prepareRegexPattern(pattern),
+    // partial regex
+    preparePartialRegex(pattern)
+  ];
+};
+
+function prepareRegexPattern (pattern) {
+  return escapeRegex(pattern).replace('**', '(.+)').replace('*', '([^\\/]+)');
+}
+
+function preparePartialRegex (pattern) {
+  return pattern
+  .split('/')
+  .map(function (item, index) {
+    if (index)
+      return '([\\/]?(' + prepareRegexPattern(item) + '\\b|$))';
+    else
+      return '(' + prepareRegexPattern(item) + '\\b)';
+  })
+  .join('');
+}
+
+function escapeRegex (pattern) {
+  return pattern.replace(/[\-\[\]\/\{\}\(\)\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
 
 /***/ }),
 
@@ -595,18 +655,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = __webpack_require__(470);
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - No Types
-const parse_gitignore_1 = __importDefault(__webpack_require__(464));
+const gitignore_parser_1 = __importDefault(__webpack_require__(773));
 const fs_1 = __importDefault(__webpack_require__(747));
 const path_1 = __webpack_require__(622);
 const parseGitIgnore = (path) => {
-    const gitIgnoreLines = parse_gitignore_1.default(fs_1.default.readFileSync(path_1.join(path, '.gitignore')));
-    const gitIgnoreLinesAsString = gitIgnoreLines.join(',');
-    core_1.debug(gitIgnoreLinesAsString);
-    core_1.setOutput('gitignored', gitIgnoreLinesAsString);
-    return new Set(gitIgnoreLines);
+    const gitIgnoreFile = fs_1.default.readFileSync(path_1.join(path, '.gitignore'), 'utf8');
+    const gitIgnore = gitignore_parser_1.default.compile(gitIgnoreFile);
+    return gitIgnore;
 };
 exports.default = parseGitIgnore;
 

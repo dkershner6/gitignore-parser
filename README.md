@@ -9,8 +9,9 @@ GitHub Action to parse a .gitignore file for information. Generally, this is mos
 | key | default | required | description |
 |-----|---------|----------|-------------|
 | path | `./` | false | The location of the .gitignore file from the repo root, with no filename. |
-| ignored_includes | `''` | false | Comma-delimited string of what the gitignore must include |
-| fail_if_not_found | `'true'` | false | Boolean string ('true'/'false') to indicate whether the workflow should fail if a string in ignored_includes is not found |
+| must_deny | `''` | false | Comma-delimited string of files and paths the gitignore must deny being committed |
+| must_accept | `''` | false | Comma-delimited string of files and paths the gitignore must accept being committed |
+| fail_on_error | `'true'` | false | Boolean string ('true'/'false') to indicate whether the workflow should fail if a string in must_deny is not found |
 
 ### Outputs
 
@@ -19,8 +20,9 @@ Will exist on `${{ steps.[id].outputs.[key] }}`
 | key | description |
 |-----|-------------|
 | gitignored | A Comma-delimited string containing all lines in gitignore |
-| all_included | Returns a boolean string ('true'/'false') representing whether all of the lines in ignored_includes were indeed included |
-| lines_not_included | A Comma-delimited string containing all of the lines from ignored_includes that were not included |
+| requirements_met | Returns a boolean string ('true'/'false') representing whether all of the lines in must_deny were indeed denied, and all must_accept were accepted |
+| not_denied | A Comma-delimited string containing all of the lines from must_deny that were not denied |
+| not_accepted | A Comma-delimited string containing all of the lines from must_accept that were not accepted |
 
 ### Example Workflow
 
@@ -41,7 +43,7 @@ jobs:
         id: gitignore-parser
         uses: dkershner6/gitignore-parser@v1
         with:
-            ignored_includes: '.npmrc,.env'
+            must_deny: '.npmrc,.env'
       # Will fail if it doesn't contain either, but outputs are also present
       - name: Print whether .gitignore contains .npmrc and .env
         run: echo ${{ steps.gitignore-parser.outputs.all_included }}

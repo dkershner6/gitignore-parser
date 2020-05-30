@@ -1,25 +1,30 @@
-import * as core from '@actions/core';
+import { setFailed, error as errorLog } from '@actions/core';
 import gatherAllInputs from './tasks/gatherAllInputs';
 import parseGitIgnore from './tasks/parseGitIgnore';
-import filterToNotIncluded from './tasks/filterToNotIncluded';
+import filterDeniedAndAccepted from './tasks/filterDeniedAndAccepted';
 import respond from './tasks/respond';
 
 export default async function run(inputs?: {
     [key: string]: string;
 }): Promise<void> {
     try {
-        const { path, includesLines, failIfNotFound } = gatherAllInputs(inputs);
+        const { path, mustDeny, mustAccept, failOnError } = gatherAllInputs(
+            inputs
+        );
 
         const gitIgnoreLines = parseGitIgnore(path);
 
-        const linesNotIncluded = filterToNotIncluded(
-            includesLines,
+        const { notDenied, notAccepted } = filterDeniedAndAccepted(
+            mustDeny,
+            mustAccept,
             gitIgnoreLines
         );
 
-        respond(linesNotIncluded, failIfNotFound);
+        respond(notDenied, notAccepted, failOnError);
     } catch (error) {
-        core.setFailed(error.message);
+        // eslint-disable-next-line no-console
+        console.error(error);
+        setFailed(error.message);
     }
 }
 

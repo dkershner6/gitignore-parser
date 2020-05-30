@@ -1,23 +1,48 @@
 import { setOutput, error, setFailed } from '@actions/core';
 
-export const ERROR_MESSAGE_PREFIX =
+export const DENY_ERROR_MESSAGE_PREFIX =
     'Please add the following to your .gitignore file (replace commas with new lines): ';
+export const ACCEPT_ERROR_MESSAGE_PREFIX =
+    'Please remove the following from your .gitignore file (might be a pattern, or add to .gitignore with a ! in front): ';
 
-const respond = (linesNotIncluded: string[], failIfNotFound: boolean): void => {
-    const linesNotIncludedString = linesNotIncluded.join(',');
-    const errorMessage = `${ERROR_MESSAGE_PREFIX}${linesNotIncludedString}`;
-
-    setOutput('lines_not_included', linesNotIncludedString);
-
-    if (linesNotIncluded.length === 0) {
-        setOutput('all_included', 'true');
-    } else {
-        setOutput('all_included', 'false');
-        error(errorMessage);
+const respond = (
+    notDenied: string[],
+    notAccepted: string[],
+    failOnError: boolean
+): void => {
+    const notDeniedString = notDenied.join(',');
+    setOutput('not_denied', notDeniedString);
+    if (notDenied.length > 0) {
+        const denyErrorMessage = `${DENY_ERROR_MESSAGE_PREFIX}${notDeniedString}`;
+        error(denyErrorMessage);
     }
 
-    if (failIfNotFound && linesNotIncluded.length > 0) {
-        setFailed(errorMessage);
+    const notAcceptedString = notAccepted.join(',');
+    setOutput('not_accepted', notAcceptedString);
+    if (notAccepted.length > 0) {
+        const acceptErrorMessage = `${ACCEPT_ERROR_MESSAGE_PREFIX}${notAcceptedString}`;
+        error(acceptErrorMessage);
+    }
+
+    const requirementsAreMet =
+        notDenied.length === 0 && notAccepted.length === 0;
+
+    finalResponse(requirementsAreMet, failOnError);
+};
+
+const finalResponse = (
+    requirementsAreMet: boolean,
+    failOnError: boolean
+): void => {
+    if (requirementsAreMet) {
+        setOutput('requirements_met', 'true');
+    } else {
+        setOutput('requirements_met', 'false');
+        if (failOnError) {
+            setFailed(
+                'A .gitignore error occurred, see above error logging for details.'
+            );
+        }
     }
 };
 

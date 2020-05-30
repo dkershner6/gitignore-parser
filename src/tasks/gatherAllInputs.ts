@@ -2,28 +2,34 @@ import { getInput, debug } from '@actions/core';
 
 export interface IInputs {
     path: string;
-    includesLines: string[];
-    failIfNotFound: boolean;
+    mustDeny: string[];
+    mustAccept: string[];
+    failOnError: boolean;
 }
 
 const gatherAllInputs = (inputs?: { [key: string]: string }): IInputs => {
     const pathInput: string = inputs?.path ?? getInput('path');
     debug(`Input - path: ${pathInput}`);
 
-    const includesLinesInput: string =
-        inputs?.ignored_includes ?? getInput('ignored_includes');
-    debug(`Input - ignored_includes: ${includesLinesInput}`);
+    const mustDenyInput: string =
+        inputs?.must_deny ?? getInput('must_deny') ?? '';
+    debug(`Input - must_deny: ${mustDenyInput}`);
 
-    const failIfNotFoundInput: string =
-        inputs?.fail_if_not_found ?? getInput('fail_if_not_found');
-    debug(`Input - fail_if_not_found: ${failIfNotFoundInput}`);
+    const mustAcceptInput: string =
+        inputs?.must_accept ?? getInput('must_accept') ?? '';
+    debug(`Input - must_accept: ${mustAcceptInput}`);
 
-    const failIfNotFound = failIfNotFoundInput === 'false' ? false : true;
+    const failOnErrorInput: string =
+        inputs?.fail_on_error ?? getInput('fail_on_error');
+    debug(`Input - fail_on_error: ${failOnErrorInput}`);
+
+    const failOnError = failOnErrorInput === 'false' ? false : true;
 
     return {
         path: pathInput ?? '/',
-        includesLines: includesLinesInput?.split(',') ?? [],
-        failIfNotFound,
+        mustDeny: mustDenyInput?.split(',') ?? [],
+        mustAccept: mustAcceptInput?.split(',') ?? [],
+        failOnError,
     };
 };
 
