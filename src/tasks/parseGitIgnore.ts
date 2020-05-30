@@ -1,5 +1,5 @@
-import * as core from '@actions/core';
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+import { debug, setOutput } from '@actions/core';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - No Types
 import parse from 'parse-gitignore';
 import fs from 'fs';
@@ -10,8 +10,8 @@ const parseGitIgnore = (path: string): Set<string> => {
         fs.readFileSync(join(path, '.gitignore'))
     );
     const gitIgnoreLinesAsString = gitIgnoreLines.join(',');
-    core.debug(gitIgnoreLinesAsString);
-    core.setOutput('gitignored', gitIgnoreLinesAsString);
+    debug(gitIgnoreLinesAsString);
+    setOutput('gitignored', gitIgnoreLinesAsString);
     return new Set(gitIgnoreLines);
 };
 export default parseGitIgnore;

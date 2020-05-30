@@ -1,4 +1,4 @@
-import * as core from '@actions/core';
+import { getInput, debug } from '@actions/core';
 
 export interface IInputs {
     path: string;
@@ -7,23 +7,23 @@ export interface IInputs {
 }
 
 const gatherAllInputs = (inputs?: { [key: string]: string }): IInputs => {
-    const pathInput: string = inputs?.path ?? core.getInput('path');
-    core.debug(`Input - path: ${pathInput}`);
+    const pathInput: string = inputs?.path ?? getInput('path');
+    debug(`Input - path: ${pathInput}`);
 
     const includesLinesInput: string =
-        inputs?.includes_lines ?? core.getInput('includes_lines');
-    core.debug(`Input - includes_lines: ${includesLinesInput}`);
+        inputs?.ignored_includes ?? getInput('ignored_includes');
+    debug(`Input - ignored_includes: ${includesLinesInput}`);
 
     const failIfNotFoundInput: string =
-        inputs?.fail_if_not_found ?? core.getInput('fail_if_not_found');
-    core.debug(`Input - fail_if_not_found: ${failIfNotFoundInput}`);
+        inputs?.fail_if_not_found ?? getInput('fail_if_not_found');
+    debug(`Input - fail_if_not_found: ${failIfNotFoundInput}`);
 
     const failIfNotFound = failIfNotFoundInput === 'false' ? false : true;
 
     return {
         path: pathInput ?? '/',
         includesLines: includesLinesInput?.split(',') ?? [],
-        failIfNotFound
+        failIfNotFound,
     };
 };
 
