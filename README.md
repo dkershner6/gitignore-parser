@@ -7,6 +7,7 @@ GitHub Action to parse a .gitignore file for information. Generally, this is mos
 ### Inputs
 
 | key | default | required | description |
+|-----|---------|----------|-------------|
 | path | `./` | false | The location of the .gitignore file from the repo root, with no filename. |
 | ignored_includes | `''` | false | Comma-delimited string of what the gitignore must include |
 | fail_if_not_found | `'true'` | false | Boolean string ('true'/'false') to indicate whether the workflow should fail if a string in ignored_includes is not found |
@@ -16,6 +17,7 @@ GitHub Action to parse a .gitignore file for information. Generally, this is mos
 Will exist on `${{ steps.[id].outputs.[key] }}`
 
 | key | description |
+|-----|-------------|
 | gitignored | A Comma-delimited string containing all lines in gitignore |
 | all_included | Returns a boolean string ('true'/'false') representing whether all of the lines in ignored_includes were indeed included |
 | lines_not_included | A Comma-delimited string containing all of the lines from ignored_includes that were not included |
