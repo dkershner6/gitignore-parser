@@ -1,8 +1,10 @@
 import * as core from '@actions/core';
 import run from '../src/main';
+import { ERROR_MESSAGE_PREFIX } from '../src/tasks/respond';
 
 describe('Main', () => {
     const setOutputSpy = jest.spyOn(core, 'setOutput');
+    const errorSpy = jest.spyOn(core, 'error');
     const setFailedSpy = jest.spyOn(core, 'setFailed');
 
     afterEach(() => {
@@ -22,6 +24,7 @@ describe('Main', () => {
         expect(outputCalls[0]).toEqual(['gitignored', 'test,test1234']);
         expect(outputCalls[1]).toEqual(['lines_not_included', '']);
         expect(outputCalls[2]).toEqual(['all_included', 'true']);
+        expect(errorSpy).not.toHaveBeenCalled();
         expect(setFailedSpy).not.toHaveBeenCalled();
     });
 
@@ -35,10 +38,17 @@ describe('Main', () => {
 
         const outputCalls = setOutputSpy.mock.calls;
 
+        const expectedNotIncluded = 'test,test1234';
+        const expectedErrorMessage = `${ERROR_MESSAGE_PREFIX}${expectedNotIncluded}`;
+
         expect(outputCalls[0]).toEqual(['gitignored', '']);
-        expect(outputCalls[1]).toEqual(['lines_not_included', 'test,test1234']);
+        expect(outputCalls[1]).toEqual([
+            'lines_not_included',
+            expectedNotIncluded,
+        ]);
         expect(outputCalls[2]).toEqual(['all_included', 'false']);
-        expect(setFailedSpy).toHaveBeenCalled();
+        expect(errorSpy).toHaveBeenCalledWith(expectedErrorMessage);
+        expect(setFailedSpy).toHaveBeenCalledWith(expectedErrorMessage);
     });
 
     it('Should return blank gitignored, 2 lines_not_included, and all_included false, but not fail', () => {
@@ -52,9 +62,16 @@ describe('Main', () => {
 
         const outputCalls = setOutputSpy.mock.calls;
 
+        const expectedNotIncluded = 'test,test1234';
+        const expectedErrorMessage = `${ERROR_MESSAGE_PREFIX}${expectedNotIncluded}`;
+
         expect(outputCalls[0]).toEqual(['gitignored', '']);
-        expect(outputCalls[1]).toEqual(['lines_not_included', 'test,test1234']);
+        expect(outputCalls[1]).toEqual([
+            'lines_not_included',
+            expectedNotIncluded,
+        ]);
         expect(outputCalls[2]).toEqual(['all_included', 'false']);
+        expect(errorSpy).toHaveBeenCalledWith(expectedErrorMessage);
         expect(setFailedSpy).not.toHaveBeenCalled();
     });
 
