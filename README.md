@@ -38,11 +38,11 @@ jobs:
         uses: actions/checkout@master
 
       - name: Ensure .npmrc and .env are .gitignored
-        id: gitignore_parser
+        id: gitignore-parser
         uses: dkershner6/gitignore-parser@v1
         with:
             ignored_includes: '.npmrc,.env'
       # Will fail if it doesn't contain either, but outputs are also present
       - name: Print whether .gitignore contains .npmrc and .env
-        run: echo ${{ steps.gitignore_parser.outputs.all_included }}
+        run: echo ${{ steps.gitignore-parser.outputs.all_included }}
 ```
