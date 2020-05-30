@@ -10,9 +10,6 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-          fetch-depth: 0
       - name: Extract version
         id: extract_version
         uses: Saionaro/extract-package-version@v1.0.6
@@ -22,6 +19,6 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           tag: "v${{ steps.extract_version.outputs.version }}"
       - name: Update release tags for latest major and minor releases
-        uses: bewuethr/release-tracker-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: haya14busa/action-update-semver@v1
+        with:
+          tag: "v${{ steps.extract_version.outputs.version }}"
