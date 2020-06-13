@@ -22,7 +22,7 @@ jobs:
           npm i
           npm run build
           npm run pack
-          
+
       - name: Run self
         uses: ./
         id: "gitignore-parser"
@@ -39,7 +39,6 @@ jobs:
         with:
           fetch-depth: 0
       - run: npm i
-
       - name: Comment with Test Coverage
         uses: dkershner6/jest-coverage-commenter-action@v1
         with:
