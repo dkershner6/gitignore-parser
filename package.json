@@ -3,7 +3,7 @@
   "version": "1.0.13",
   "private": true,
   "description": "GitHub Action to parse a .gitignore file for information",
-  "main": "lib/main.js",
+  "main": "lib/src/main.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
