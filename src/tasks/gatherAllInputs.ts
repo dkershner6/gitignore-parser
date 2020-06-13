@@ -1,4 +1,4 @@
-import { getInput, debug } from '@actions/core';
+import { getInput, debug, error } from '@actions/core';
 
 export interface IInputs {
     path: string;
@@ -8,29 +8,34 @@ export interface IInputs {
 }
 
 const gatherAllInputs = (inputs?: { [key: string]: string }): IInputs => {
-    const pathInput: string = inputs?.path ?? getInput('path');
-    debug(`Input - path: ${pathInput}`);
+    try {
+        const pathInput: string = inputs?.path ?? getInput('path');
+        debug(`Input - path: ${pathInput}`);
 
-    const mustDenyInput: string =
-        inputs?.must_deny ?? getInput('must_deny') ?? '';
-    debug(`Input - must_deny: ${mustDenyInput}`);
+        const mustDenyInput: string =
+            inputs?.must_deny ?? getInput('must_deny') ?? '';
+        debug(`Input - must_deny: ${mustDenyInput}`);
 
-    const mustAcceptInput: string =
-        inputs?.must_accept ?? getInput('must_accept') ?? '';
-    debug(`Input - must_accept: ${mustAcceptInput}`);
+        const mustAcceptInput: string =
+            inputs?.must_accept ?? getInput('must_accept') ?? '';
+        debug(`Input - must_accept: ${mustAcceptInput}`);
 
-    const failOnErrorInput: string =
-        inputs?.fail_on_error ?? getInput('fail_on_error');
-    debug(`Input - fail_on_error: ${failOnErrorInput}`);
+        const failOnErrorInput: string =
+            inputs?.fail_on_error ?? getInput('fail_on_error');
+        debug(`Input - fail_on_error: ${failOnErrorInput}`);
 
-    const failOnError = failOnErrorInput === 'false' ? false : true;
+        const failOnError = failOnErrorInput === 'false' ? false : true;
 
-    return {
-        path: pathInput ?? '/',
-        mustDeny: mustDenyInput?.split(',') ?? [],
-        mustAccept: mustAcceptInput?.split(',') ?? [],
-        failOnError,
-    };
+        return {
+            path: pathInput ?? '/',
+            mustDeny: mustDenyInput?.split(',') ?? [],
+            mustAccept: mustAcceptInput?.split(',') ?? [],
+            failOnError,
+        };
+    } catch (err) {
+        error('There was an error while gathering inputs');
+        throw err;
+    }
 };
 
 export default gatherAllInputs;

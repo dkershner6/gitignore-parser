@@ -23,6 +23,20 @@ jobs:
       # Will fail if it doesn't contain either, but outputs are also present
       - name: Print whether .gitignore denies above
         run: echo ${{ steps.gitignore-parser.outputs.requirements_met }}
+  test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: npm i
+
+      - name: Comment with Test Coverage
+        uses: dkershner6/jest-coverage-commenter-action@v1
+        with:
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          test_command: "npm run test:coverage"
   other-checks:
     runs-on: ubuntu-latest
     steps:

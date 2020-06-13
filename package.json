@@ -1,6 +1,6 @@
 {
   "name": "@dkershner6/gitignore-parser",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "private": true,
   "description": "GitHub Action to parse a .gitignore file for information",
   "main": "lib/main.js",
@@ -12,6 +12,7 @@
     "pack": "ncc build",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --changedSince=origin/master",
     "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
   },
   "repository": {
