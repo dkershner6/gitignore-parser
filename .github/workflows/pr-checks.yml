@@ -15,8 +15,16 @@ jobs:
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: ./
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: |
+          npm i
+          npm run build
+          npm run pack
+          
+      - name: Run self
+        uses: ./
         id: "gitignore-parser"
         with:
           must_deny: "node_modules,lib/**/*"
