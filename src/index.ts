@@ -3,11 +3,10 @@ import filterDeniedAndAccepted from "./tasks/filterDeniedAndAccepted";
 import gatherAllInputs from "./tasks/gatherAllInputs";
 import parseGitIgnore from "./tasks/parseGitIgnore";
 import respond from "./tasks/respond";
-import packageJson from "../package.json";
 
 export async function run(inputs?: { [key: string]: string }): Promise<void> {
     try {
-        info(`GitIngore Parser v${packageJson.version}`);
+        info(`GitIngore Parser v2`);
         const { path, mustDeny, mustAccept, failOnError } =
             gatherAllInputs(inputs);
 
