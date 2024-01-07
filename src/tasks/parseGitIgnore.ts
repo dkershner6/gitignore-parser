@@ -1,5 +1,6 @@
 import fs from "fs";
 import { join } from "path";
+
 import ignore, { Ignore } from "ignore";
 
 const parseGitIgnore = (path: string): Ignore => {
