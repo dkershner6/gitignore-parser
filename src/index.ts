@@ -1,4 +1,5 @@
 import { setFailed, info } from "@actions/core";
+
 import filterDeniedAndAccepted from "./tasks/filterDeniedAndAccepted";
 import gatherAllInputs from "./tasks/gatherAllInputs";
 import parseGitIgnore from "./tasks/parseGitIgnore";

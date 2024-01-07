@@ -1,11 +1,13 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 // eslint-disable-next-line import/no-namespace
 import * as core from "@actions/core";
-import { run } from ".";
+
 import {
     DENY_ERROR_MESSAGE_PREFIX,
     ACCEPT_ERROR_MESSAGE_PREFIX,
 } from "./tasks/respond";
+
+import { run } from ".";
 
 describe("Main", () => {
     const setOutputSpy = jest.spyOn(core, "setOutput");
