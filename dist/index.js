@@ -98,7 +98,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const path_1 = __nccwpck_require__(1017);
-const ignore_1 = __importDefault(__nccwpck_require__(8513));
+const ignore_1 = __importDefault(__nccwpck_require__(9910));
 const parseGitIgnore = (path) => {
     const gitIgnoreFile = fs_1.default.readFileSync((0, path_1.join)(path, ".gitignore"), "utf8");
     return (0, ignore_1.default)().add(gitIgnoreFile);
@@ -1983,7 +1983,7 @@ function isLoopbackAddress(host) {
 
 /***/ }),
 
-/***/ 8513:
+/***/ 9910:
 /***/ ((module) => {
 
 // A simple implementation of make-array
@@ -2054,6 +2054,14 @@ const cleanRangeBackSlash = slashes => {
 
 // '`foo/`' should not continue with the '`..`'
 const REPLACERS = [
+
+  [
+    // remove BOM
+    // TODO:
+    // Other similar zero-width characters?
+    /^\uFEFF/,
+    () => EMPTY
+  ],
 
   // > Trailing spaces are ignored unless they are quoted with backslash ("\")
   [
